@@ -39,11 +39,20 @@ class ProductsPage extends Component {
       .collection("products")
       .find()
       .asArray()
-      .then((products) => {
-        console.log("Result - Products: ", products);
-        this.setState({ products: products });
+      .then((productsRetrieved) => {
+        const transformedProducts = productsRetrieved.map(
+          (productRetrieved) => {
+            productRetrieved._id = productRetrieved._id.toString();
+            productRetrieved.price = productRetrieved.price.toString();
+            console.log("productRetrieved: ", productRetrieved);
+            return productRetrieved;
+          }
+        );
+        // update the state with and for the loaded data
+        this.setState({ isLoading: false, products: transformedProducts });
       })
       .catch((err) => {
+        this.setState({ isLoading: false });
         console.log("error occurred: ", err);
         this.props.onError("Fetching products failed, please try again later");
       });

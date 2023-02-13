@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
-import './Input.css';
+import "./Input.css";
 
-const input = props => {
+const input = (props) => {
   let inputElement = <input {...props.config} onChange={props.onChange} />;
-  if (props.elType === 'textarea') {
+  if (props.elType === "textarea") {
     inputElement = <textarea {...props.config} onChange={props.onChange} />;
   }
   return (
