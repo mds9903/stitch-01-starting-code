@@ -1,7 +1,9 @@
-import React, { Component } from 'react';
-import axios from 'axios';
+import React, { Component } from "react";
+import axios from "axios";
 
-import Products from '../../components/Products/Products';
+import { Stitch, RemoteMongoClient } from "mongodb-stitch-browser-sdk";
+
+import Products from "../../components/Products/Products";
 
 class ProductsPage extends Component {
   state = { isLoading: true, products: [] };
@@ -9,32 +11,53 @@ class ProductsPage extends Component {
     this.fetchData();
   }
 
-  productDeleteHandler = productId => {
+  productDeleteHandler = (productId) => {
     axios
-      .delete('http://localhost:3100/products/' + productId)
-      .then(result => {
+      .delete("http://localhost:3100/products/" + productId)
+      .then((result) => {
         console.log(result);
         this.fetchData();
       })
-      .catch(err => {
+      .catch((err) => {
         this.props.onError(
-          'Deleting the product failed. Please try again later'
+          "Deleting the product failed. Please try again later"
         );
         console.log(err);
       });
   };
 
   fetchData = () => {
-    axios
-      .get('http://localhost:3100/products')
-      .then(productsResponse => {
-        this.setState({ isLoading: false, products: productsResponse.data });
+    // get the db as a variable
+    const mongodb = Stitch.defaultAppClient.getServiceClient(
+      RemoteMongoClient.factory,
+      "mongodb-atlas"
+    );
+
+    // perform crud methods
+    mongodb
+      .db("shop")
+      .collection("products")
+      .find()
+      .asArray()
+      .then((products) => {
+        console.log("Result - Products: ", products);
+        this.setState({ products: products });
       })
-      .catch(err => {
-        this.setState({ isLoading: false, products: [] });
-        this.props.onError('Loading products failed. Please try again later');
-        console.log(err);
+      .catch((err) => {
+        console.log("error occurred: ", err);
+        this.props.onError("Fetching products failed, please try again later");
       });
+
+    // axios
+    //   .get("http://localhost:3100/products")
+    //   .then((productsResponse) => {
+    //     this.setState({ isLoading: false, products: productsResponse.data });
+    //   })
+    //   .catch((err) => {
+    //     this.setState({ isLoading: false, products: [] });
+    //     this.props.onError("Loading products failed. Please try again later");
+    //     console.log(err);
+    //   });
   };
 
   render() {

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
+import { Stitch, AnonymousCredential } from "mongodb-stitch-browser-sdk";
 
 import Header from "./components/Header/Header";
 import Modal from "./components/Modal/Modal";
@@ -19,36 +20,42 @@ class App extends Component {
     error: null,
   };
 
+  constructor() {
+    super();
+    const client = Stitch.initializeDefaultAppClient("myapp-qodnj");
+    client.auth.loginWithCredential(new AnonymousCredential());
+  }
+
   logoutHandler = () => {
     this.setState({ isAuth: false });
   };
 
   authHandler = (event, authData) => {
     event.preventDefault();
-    if (authData.email.trim() === "" || authData.password.trim() === "") {
-      return;
-    }
-    let request;
-    if (this.state.authMode === "login") {
-      request = axios.post("http://localhost:3100/login", authData);
-    } else {
-      request = axios.post("http://localhost:3100/signup", authData);
-    }
-    request
-      .then((authResponse) => {
-        if (authResponse.status === 201 || authResponse.status === 200) {
-          const token = authResponse.data.token;
-          console.log(token);
-          // Theoretically, you would now store the token in localstorage + app state
-          // and use it for subsequent requests to protected backend resources
-          this.setState({ isAuth: true });
-        }
-      })
-      .catch((err) => {
-        this.errorHandler(err.response.data.message);
-        console.log(err);
-        this.setState({ isAuth: false });
-      });
+    // if (authData.email.trim() === "" || authData.password.trim() === "") {
+    //   return;
+    // }
+    // let request;
+    // if (this.state.authMode === "login") {
+    //   request = axios.post("http://localhost:3100/login", authData);
+    // } else {
+    //   request = axios.post("http://localhost:3100/signup", authData);
+    // }
+    // request
+    //   .then((authResponse) => {
+    //     if (authResponse.status === 201 || authResponse.status === 200) {
+    //       const token = authResponse.data.token;
+    //       console.log(token);
+    //       // Theoretically, you would now store the token in localstorage + app state
+    //       // and use it for subsequent requests to protected backend resources
+    //       this.setState({ isAuth: true });
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     this.errorHandler(err.response.data.message);
+    //     console.log(err);
+    //     this.setState({ isAuth: false });
+    //   });
   };
 
   authModeChangedHandler = () => {
